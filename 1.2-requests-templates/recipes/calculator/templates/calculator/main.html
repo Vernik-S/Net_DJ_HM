@@ -6,5 +6,10 @@
 </head>
 <body>
 
+<ul>
+    <li><a href=" {% url 'recipe' 'omlet' %}">Рецепт без servings </a></li>
+    <li><a href=" {% url 'recipe' 'omlet' %}?servings=10" > Рецепт с servings </a></li>
+    <li><a href=" {% url 'recipe' 'qwerty' %}">Отуствующий рецепт </a></li>
+</ul>
 </body>
 </html>
