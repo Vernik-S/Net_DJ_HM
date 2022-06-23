@@ -12,7 +12,6 @@ def index(request):
     return redirect('books')
 
 def books_view(request):
-    #template = 'books/books_list.html'
     template = 'books/books_list_my.html'
     book_objects = Book.objects.all()
     context = {
@@ -39,9 +38,6 @@ def date_view(request, date):
 
     dates_count = len(all_date_string)
     next_date = all_date_string[(all_date_string.index(date) + 1) % dates_count]
-    i = all_date_string.index(date)
-    i = i + 1
-    i = i % dates_count
     prev_date = all_date_string[(all_date_string.index(date) - 1) % dates_count]
 
     book_objects = Book.objects.filter(pub_date=date)
