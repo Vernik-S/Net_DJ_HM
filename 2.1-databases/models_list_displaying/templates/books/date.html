@@ -1,0 +1,15 @@
+{% extends "books/books_list_my.html" %}
+
+{% block pagination %}
+
+    <h5>
+
+            <a class="button button-primary" href="{% url 'date' date=prev_date %}">⟵</a>
+
+        <a class="button disabled" href="">{{ date }}</a>
+
+            <a class="button button-primary" href="{% url 'date' date=next_date %} ">⟶</a>
+
+    </h5>
+
+{% endblock %}
