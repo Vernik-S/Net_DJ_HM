@@ -8,7 +8,7 @@ def students_list(request):
     template = 'school/students_list.html'
 
 
-    object_list = list(Student.objects.all().order_by('group'))
+    object_list = list(Student.objects.all().order_by('group').prefetch_related("teacher"))
 
     # используйте этот параметр для упорядочивания результатов
     # https://docs.djangoproject.com/en/2.2/ref/models/querysets/#django.db.models.query.QuerySet.order_byordering = 'group'
