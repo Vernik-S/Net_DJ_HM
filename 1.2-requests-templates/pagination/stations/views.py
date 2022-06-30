@@ -41,6 +41,8 @@ def bus_stations(request):
     paginator = Paginator(stations, 10)
     page = paginator.get_page(page_num)
 
+
+
     context = {
         'bus_stations': page.object_list,
         'page': page

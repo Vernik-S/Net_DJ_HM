@@ -32,20 +32,15 @@ def date_view(request, date):
 
 
 
-    #page_num = request.GET.get("page", 1)
-    #paginator = Paginator(all_date_string, 1)
-    #page = paginator.get_page(page_num)
 
-    dates_count = len(all_date_string)
-    next_date = all_date_string[(all_date_string.index(date) + 1) % dates_count]
-    prev_date = all_date_string[(all_date_string.index(date) - 1) % dates_count]
+    paginator = Paginator(all_date_string, 1)
+    current_page_num = all_date_string.index(date) + 1
+    page = paginator.get_page(current_page_num)
 
     book_objects = Book.objects.filter(pub_date=date)
 
     context = {
         "books" : book_objects,
-        "date": date,
-        "next_date": next_date,
-        "prev_date": prev_date
+        "page": page,
     }
     return render(request, template, context)

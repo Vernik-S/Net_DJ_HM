@@ -1,15 +1,19 @@
 {% extends "books/books_list_my.html" %}
 
+{% load datepage %}
+
 {% block pagination %}
 
     <h5>
+        {% if page.has_previous %}
+            <a class="button button-primary" href="{% url 'date' date=page|prev_date %}">⟵</a>
+        {% endif %}
 
-            <a class="button button-primary" href="{% url 'date' date=prev_date %}">⟵</a>
+        <a class="button disabled" href=""> {{page.object_list.0}}</a>
 
-        <a class="button disabled" href="">{{ date }}</a>
-
-            <a class="button button-primary" href="{% url 'date' date=next_date %} ">⟶</a>
-
+        {% if page.has_next %}
+          <a class="button button-primary" href="{% url 'date' date=page|next_date %} ">⟶</a>
+        {% endif %}
     </h5>
 
 {% endblock %}
