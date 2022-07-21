@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from logistic.models import Product, StockProduct, Stock
 
@@ -14,6 +15,12 @@ class ProductPositionSerializer(serializers.ModelSerializer):
         model = StockProduct
         fields = ['id', 'stock', 'product', 'quantity', 'price', ]
         extra_kwargs = {'stock': {'required': False}}
+
+    def validate_quantity(self, value):
+        if value > 1000:
+            raise ValidationError("Не больше тысячи штук на одном складе")
+
+        return value
 
 
 class StockSerializer(serializers.ModelSerializer):
@@ -38,7 +45,7 @@ class StockSerializer(serializers.ModelSerializer):
         for position in positions:
             StockProduct.objects.create(stock=stock, **position)
             print(position)
-            print(**position)
+            # print(**position)
 
         return stock
 
