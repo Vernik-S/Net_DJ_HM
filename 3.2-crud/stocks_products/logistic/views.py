@@ -23,5 +23,7 @@ class StockViewSet(ModelViewSet):
     serializer_class = StockSerializer
     # при необходимости добавьте параметры фильтрации
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['id', ]
+    filterset_fields = ['id', 'products', ]
+    search_fields = ['products__title', 'products__description']
+    SearchFilter.search_param = "products_search" #для допзадания. Параметр поиска был изменен чтобы не было конфликта с поиском по id продукта
     pagination_class = LimitOffsetPagination
