@@ -22,6 +22,12 @@ class ProductPositionSerializer(serializers.ModelSerializer):
 
         return value
 
+    def validate_price(self, value):
+        if value <= 0:
+            raise ValidationError("Цена должна быть больше нуля")
+
+        return value
+
 
 class StockSerializer(serializers.ModelSerializer):
     positions = ProductPositionSerializer(many=True)
@@ -43,9 +49,8 @@ class StockSerializer(serializers.ModelSerializer):
         # с помощью списка positions
 
         for position in positions:
-            StockProduct.objects.create(stock=stock, **position)
-            print(position)
-            # print(**position)
+            position_object = StockProduct.objects.create(stock=stock, **position)
+            stock.positions.add(position_object)
 
         return stock
 
@@ -59,5 +64,18 @@ class StockSerializer(serializers.ModelSerializer):
         # здесь вам надо обновить связанные таблицы
         # в нашем случае: таблицу StockProduct
         # с помощью списка positions
+        # print(validated_data)
+        # print(positions)
+        for position in positions:
+            product = position.pop("product")
+
+            position_object, created = StockProduct.objects.update_or_create(stock=stock, product=product,
+                                                                             defaults={**position})
+
+            # stockproduct_object = StockProduct.objects.filter(stock=stock, product=product)
+            # print(stockproduct_object)
+            # stock.positions.add(position_object)
+            # print(position)
+            # print(**position)
 
         return stock
