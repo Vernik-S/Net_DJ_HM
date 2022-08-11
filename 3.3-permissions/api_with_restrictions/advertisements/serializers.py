@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from advertisements.models import Advertisement
+from advertisements.models import Advertisement, AdvFavUser
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -46,5 +46,27 @@ class AdvertisementSerializer(serializers.ModelSerializer):
             qs = Advertisement.objects.filter(creator=self.context["request"].user, status="OPEN")
             print(qs.count())
             if qs.count() >= 10: raise ValidationError("Не больше десяти открытых объявлений для пользователя")
+
+        return data
+
+
+class AdvFavSerializer(serializers.ModelSerializer):
+   # user = UserSerializer(
+   #     read_only=True,
+   # )
+
+    class Meta:
+        model = AdvFavUser
+        fields = ('id', 'adv', 'user')
+
+    # def create(self, validated_data):
+    #     validated_data["user"] = self.context["request"].user
+    #     return super().create(validated_data)
+
+    def validate(self, data):
+
+        #if self.context["request"].method == "POST":
+        if data["adv"].creator == data["user"]:
+            raise ValidationError("Нельзя добавлять в избранное собственные сообщения")
 
         return data
