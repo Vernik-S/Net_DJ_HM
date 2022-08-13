@@ -24,9 +24,9 @@ class AdvertisementViewSet(ModelViewSet):
 
     def get_permissions(self):
         """Получение прав для действий."""
-        if self.action in ["create", ]:
+        if self.action in ["create", "add_to_fav", "get_fav"]:
             return [IsAuthenticated()]
-        elif self.action in ["update", "partial_update", "destroy"]:
+        elif self.action in ["update", "partial_update", "destroy", "del_from_fav"]:
             return [IsOwnerOrAdmin()]
         return [(IsNotDraft | IsOwnerOrAdmin)()]  # доп задание DRAFT
 
@@ -40,7 +40,7 @@ class AdvertisementViewSet(ModelViewSet):
             )
             return qs
 
-    @action(detail=True, methods=["post",], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=["post",], ) #permission_classes=[IsAuthenticated]
     def add_to_fav(self, request, pk):
         #adv = self.get_object()
         user = request.user
@@ -55,7 +55,7 @@ class AdvertisementViewSet(ModelViewSet):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=["delete", ], permission_classes=[IsOwnerOrAdmin])
+    @action(detail=True, methods=["delete", ], ) #permission_classes=[IsOwnerOrAdmin]
     def del_from_fav(self, request, pk):
         user = request.user
 
@@ -63,11 +63,13 @@ class AdvertisementViewSet(ModelViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=["get", ], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=["get", ], ) #permission_classes=[IsAuthenticated])
     def get_fav(self, request):
         user = request.user
         qs = AdvFavUser.objects.filter(user=user)
         serializer = AdvFavSerializer(qs, many=True)
 
         return Response(serializer.data)
+
+
 
