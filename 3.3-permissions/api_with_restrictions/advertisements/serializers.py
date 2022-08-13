@@ -42,7 +42,8 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         """Метод для валидации. Вызывается при создании и обновлении."""
 
         # TODO: добавьте требуемую валидацию
-        if self.context["request"].method == "POST" or \ #валидация для всех POST и для PUT и PUTCH если статус OPEN
+        # валидация для всех POST и для PUT и PUTCH если статус OPEN
+        if self.context["request"].method == "POST" or \
                 (self.context["request"].method in ["PUT", "PATCH"] and
                  self.context["request"].data.get("status") == "OPEN"):
             qs = Advertisement.objects.filter(creator=self.context["request"].user, status="OPEN")
