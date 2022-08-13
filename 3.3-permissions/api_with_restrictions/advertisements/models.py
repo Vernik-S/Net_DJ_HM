@@ -32,5 +32,5 @@ class Advertisement(models.Model):
 
 
 class AdvFavUser(models.Model):
-    adv = models.ForeignKey(Advertisement, on_delete=models.CASCADE, related_name='favorites')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='users_fav')
+    adv = models.ForeignKey(Advertisement, on_delete=models.CASCADE, related_name='users_fav')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites')

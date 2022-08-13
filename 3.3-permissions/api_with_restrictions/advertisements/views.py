@@ -1,4 +1,7 @@
+from django.contrib.auth.models import User
+from django.db import connection
 from django_filters.rest_framework import DjangoFilterBackend
+from django.conf import settings
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -28,7 +31,7 @@ class AdvertisementViewSet(ModelViewSet):
             return [IsAuthenticated()]
         elif self.action in ["update", "partial_update", "destroy", "del_from_fav"]:
             return [IsOwnerOrAdmin()]
-        return [(IsNotDraft | IsOwnerOrAdmin)()]  # доп задание DRAFT
+        return [(IsNotDraft | IsOwnerOrAdmin)()]  # доп задание DRAFT. При get черновики будут показываться не всем
 
     def get_queryset(self):  # доп задание DRAFT
         if self.request.user.is_staff:
@@ -40,9 +43,9 @@ class AdvertisementViewSet(ModelViewSet):
             )
             return qs
 
-    @action(detail=True, methods=["post",], ) #permission_classes=[IsAuthenticated]
+    @action(detail=True, methods=["post", ], )  # permission_classes=[IsAuthenticated]
     def add_to_fav(self, request, pk):
-        #adv = self.get_object()
+        # adv = self.get_object()
         user = request.user
         data = {
             "adv": pk,
@@ -55,7 +58,7 @@ class AdvertisementViewSet(ModelViewSet):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=["delete", ], ) #permission_classes=[IsOwnerOrAdmin]
+    @action(detail=True, methods=["delete", ], )  # permission_classes=[IsOwnerOrAdmin]
     def del_from_fav(self, request, pk):
         user = request.user
 
@@ -63,13 +66,13 @@ class AdvertisementViewSet(ModelViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=["get", ], ) #permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=["get", ], )  # permission_classes=[IsAuthenticated])
     def get_fav(self, request):
         user = request.user
-        qs = AdvFavUser.objects.filter(user=user)
-        serializer = AdvFavSerializer(qs, many=True)
+        # qs = AdvFavUser.objects.filter(user=user)
+        qs = Advertisement.objects.filter(users_fav__user=user)
+        print(qs.query)
+
+        serializer = AdvertisementSerializer(qs, many=True)
 
         return Response(serializer.data)
-
-
-
