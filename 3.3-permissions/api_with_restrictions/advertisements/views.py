@@ -31,7 +31,9 @@ class AdvertisementViewSet(ModelViewSet):
             return [IsAuthenticated()]
         elif self.action in ["update", "partial_update", "destroy", "del_from_fav"]:
             return [IsOwnerOrAdmin()]
+
         return [(IsNotDraft | IsOwnerOrAdmin)()]  # доп задание DRAFT. При get черновики будут показываться не всем
+
 
     def get_queryset(self):  # доп задание DRAFT
         if self.request.user.is_staff:
