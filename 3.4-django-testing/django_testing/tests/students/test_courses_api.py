@@ -40,3 +40,20 @@ def test_one_course(client, course_factory):
     #assert  data["name"] == "random name"
 
     assert data["name"] == course_test.name
+
+
+@pytest.mark.django_db
+def test_list_courses(client, course_factory):
+    # Arrange
+    courses_test = course_factory(_quantity=10)
+
+    # Act
+    response = client.get(f'/api/v1/courses/', follow=True)
+
+    # Assert
+
+    assert response.status_code == 200
+    data = response.json()
+
+    for i, response_course in enumerate(data):
+        assert response_course['name'] == courses_test[i].name
