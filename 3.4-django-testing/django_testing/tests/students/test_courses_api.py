@@ -56,6 +56,8 @@ def test_list_courses(client, course_factory):
     assert response.status_code == 200
     data = response.json()
 
+    assert len(data) == len(courses_test)
+
     for i, response_course in enumerate(data):
         assert response_course['name'] == courses_test[i].name
 
