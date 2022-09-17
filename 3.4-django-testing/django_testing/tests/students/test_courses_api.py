@@ -78,3 +78,20 @@ def test_id_filter_courses(client, course_factory):
 
     assert data[0]["name"] == random_course.name
 
+@pytest.mark.django_db
+def test_name_filter_courses(client, course_factory):
+    # Arrange
+    courses_test = course_factory(_quantity=10)
+    random_course = random.choice(courses_test)
+
+
+    # Act
+    response = client.get(f'/api/v1/courses/?name={random_course.name}', follow=True)
+
+    # Assert
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data[0]
+
+    assert data[0]["id"] == random_course.id
