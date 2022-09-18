@@ -121,6 +121,8 @@ def test_create_course(client, student_factory):
     }
     test_course_json = json.dumps(test_course_body)
 
+    count_before_create = Course.objects.count()
+
     # pprint(test_course_json)
 
     # Act
@@ -133,6 +135,7 @@ def test_create_course(client, student_factory):
     #pprint(data)
     assert data["name"] == "Test Course"
     assert len(data["students"]) == len(students_test)
+    assert Course.objects.count() > count_before_create
 
 
 @pytest.fixture
@@ -166,3 +169,16 @@ def test_update_course(client, test_course, student_factory):
     pprint(data)
     assert data["name"] == "New Name"
     assert len(data["students"]) == len(students_test)
+
+@pytest.mark.django_db
+def test_delete_course(client, test_course):
+    # Arrange
+
+    # Act
+    response_del = client.delete(f'/api/v1/courses/{test_course.id}/', follow=True,)
+    response_get = client.get(f'/api/v1/courses/{test_course.id}/', follow=True)
+    # pprint(response.json())
+
+    # Assert
+    assert response_del.status_code == 204
+    assert response_get.status_code == 404
