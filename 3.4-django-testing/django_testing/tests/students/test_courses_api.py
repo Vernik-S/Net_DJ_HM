@@ -185,18 +185,19 @@ def test_delete_course(client, test_course):
 
 
 @pytest.mark.parametrize(
-    ["students_count", "expected_status"],
+    ["max_students_test", "expected_status"],
     (
-            (1, 201),
-            (settings.MAX_STUDENTS_PER_COURSE, 201),
-            (settings.MAX_STUDENTS_PER_COURSE+1, 400),
+            (1, 400),
+            (4, 400),
+            (5, 201),
     )
 )
 @pytest.mark.django_db
-def test_max_students(client, student_factory, students_count, expected_status):
+def test_max_students(client, student_factory, max_students_test, expected_status):
     # Arrange
 
-    students_test = student_factory(_quantity=students_count)
+    students_test = student_factory(_quantity=5)
+    settings.MAX_STUDENTS_PER_COURSE=max_students_test
 
     test_course_body = {
         "name": "Test Course",
