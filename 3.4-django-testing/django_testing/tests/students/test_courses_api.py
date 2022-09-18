@@ -101,13 +101,6 @@ def test_name_filter_courses(client, course_factory):
     assert data[0]["id"] == random_course.id
 
 
-# @pytest.fixture
-# def test_students():
-#     test_student1 = Student.objects.create(name="Test Student 1")
-#     test_student2 = Student.objects.create(name="Test Student 2")
-#     return [test_student1, test_student2]
-
-
 @pytest.fixture
 def student_factory():
     def factory(*args, **kwargs):
@@ -122,22 +115,54 @@ def test_create_course(client, student_factory):
 
     students_test = student_factory(_quantity=10)
 
-
     test_course_body = {
         "name": "Test Course",
         "students": [student_test.id for student_test in students_test]
     }
     test_course_json = json.dumps(test_course_body)
 
-    #pprint(test_course_json)
+    # pprint(test_course_json)
 
     # Act
     response = client.post(f'/api/v1/courses/', data=test_course_json, follow=True, content_type="application/json")
-    #pprint(response.json())
+    # pprint(response.json())
 
     # Assert
     assert response.status_code == 201
     data = response.json()
-    pprint(data)
+    #pprint(data)
     assert data["name"] == "Test Course"
+    assert len(data["students"]) == len(students_test)
+
+
+@pytest.fixture
+def test_course():
+    return Course.objects.create(name="Test Course")
+
+
+@pytest.mark.django_db
+def test_update_course(client, test_course, student_factory):
+    # Arrange
+
+    students_test = student_factory(_quantity=10)
+
+    test_course_update_body = {
+        "name": "New Name",
+        "students": [student_test.id for student_test in students_test]
+    }
+    test_course_json = json.dumps(test_course_update_body)
+
+
+
+
+    # Act
+    response_patch = client.patch(f'/api/v1/courses/{test_course.id}/', data=test_course_json, follow=True, content_type="application/json")
+    response_get = client.get(f'/api/v1/courses/{test_course.id}/', follow=True)
+    # pprint(response.json())
+
+    # Assert
+    assert response_patch.status_code == 200
+    data = response_get.json()
+    pprint(data)
+    assert data["name"] == "New Name"
     assert len(data["students"]) == len(students_test)
