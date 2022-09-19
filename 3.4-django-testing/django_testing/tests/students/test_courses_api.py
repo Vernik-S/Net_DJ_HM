@@ -66,40 +66,62 @@ def test_list_courses(client, course_factory):
         assert response_course['name'] == courses_test[i].name
 
 
+# @pytest.mark.django_db
+# def test_id_filter_courses(client, course_factory):
+#     # Arrange
+#     courses_test = course_factory(_quantity=10)
+#     random_course = random.choice(courses_test)
+#
+#     # Act
+#     response = client.get(f'/api/v1/courses/?id={random_course.id}', follow=True)
+#
+#     # Assert
+#     assert response.status_code == 200
+#     data = response.json()
+#
+#     assert data[0]
+#
+#     assert data[0]["name"] == random_course.name
+#
+#
+# @pytest.mark.django_db
+# def test_name_filter_courses(client, course_factory):
+#     # Arrange
+#     courses_test = course_factory(_quantity=10)
+#     random_course = random.choice(courses_test)
+#
+#     # Act
+#     response = client.get(f'/api/v1/courses/?name={random_course.name}', follow=True)
+#
+#     # Assert
+#     assert response.status_code == 200
+#     data = response.json()
+#
+#     assert data[0]
+#
+#     assert data[0]["id"] == random_course.id
+
+@pytest.mark.parametrize(
+    ["filter_param", "expected_status"],
+    (
+            ('id', 200),
+            ('name', 200),
+    )
+)
 @pytest.mark.django_db
-def test_id_filter_courses(client, course_factory):
+def test_filter_courses(client, course_factory, filter_param, expected_status):
     # Arrange
     courses_test = course_factory(_quantity=10)
     random_course = random.choice(courses_test)
-
+    filter_value = getattr(random_course, filter_param)
     # Act
-    response = client.get(f'/api/v1/courses/?id={random_course.id}', follow=True)
+
+    response = client.get('/api/v1/courses/', {filter_param: filter_value}, follow=True)
 
     # Assert
-    assert response.status_code == 200
+    assert response.status_code == expected_status
     data = response.json()
-
-    assert data[0]
-
-    assert data[0]["name"] == random_course.name
-
-
-@pytest.mark.django_db
-def test_name_filter_courses(client, course_factory):
-    # Arrange
-    courses_test = course_factory(_quantity=10)
-    random_course = random.choice(courses_test)
-
-    # Act
-    response = client.get(f'/api/v1/courses/?name={random_course.name}', follow=True)
-
-    # Assert
-    assert response.status_code == 200
-    data = response.json()
-
-    assert data[0]
-
-    assert data[0]["id"] == random_course.id
+    assert data[0][filter_param] == filter_value
 
 
 @pytest.fixture
@@ -159,12 +181,12 @@ def test_update_course(client, test_course, student_factory):
     # Act
     response_patch = client.patch(f'/api/v1/courses/{test_course.id}/', data=test_course_json, follow=True,
                                   content_type="application/json")
-    response_get = client.get(f'/api/v1/courses/{test_course.id}/', follow=True)
+    # response_get = client.get(f'/api/v1/courses/{test_course.id}/', follow=True)
     # pprint(response.json())
 
     # Assert
     assert response_patch.status_code == 200
-    data = response_get.json()
+    data = response_patch.json()
     pprint(data)
     assert data["name"] == "New Name"
     assert len(data["students"]) == len(students_test)
@@ -197,7 +219,7 @@ def test_max_students(client, student_factory, max_students_test, expected_statu
     # Arrange
 
     students_test = student_factory(_quantity=5)
-    settings.MAX_STUDENTS_PER_COURSE=max_students_test
+    settings.MAX_STUDENTS_PER_COURSE = max_students_test
 
     test_course_body = {
         "name": "Test Course",
